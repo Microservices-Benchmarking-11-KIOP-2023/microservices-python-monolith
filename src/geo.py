@@ -1,4 +1,4 @@
-import pickle
+import json
 import math
 import os
 from dataclasses import dataclass
@@ -7,7 +7,7 @@ EARTH_RADIUS_KM = 6371.0
 MAX_SEARCH_RADIUS_KM = 10  # limit to 10 km
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-pickle_filepath = os.path.join(current_dir, '..', 'data', 'geo.pkl')
+json_filepath = os.path.join(current_dir, '..', 'data', 'geo.json')
 
 
 @dataclass
@@ -16,9 +16,9 @@ class Point:
     point_longitude: float
 
 
-def load_hotels(pickle_filepath):
-    with open(pickle_filepath, 'rb') as file:
-        hotels = pickle.load(file)
+def load_hotels(json_filepath):
+    with open(json_filepath, 'r') as file:
+        hotels = json.load(file)
     return hotels
 
 
@@ -53,5 +53,5 @@ def find_nearby_hotels(hotels, point, radius):
 
 def get_nearby_hotels(lat, lon):
     point = Point(point_latitude=lat, point_longitude=lon)
-    hotels = load_hotels(pickle_filepath)
+    hotels = load_hotels(json_filepath)
     return find_nearby_hotels(hotels, point, MAX_SEARCH_RADIUS_KM)
