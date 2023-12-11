@@ -1,9 +1,8 @@
 from flask import Flask, request, jsonify
 
+from data_load_module import load_data, build_inventory_index, build_hotel_profiles_index
 from geo import get_nearby_hotels
-from profile import *
-from rate import get_rates, load_data
-
+from rate import get_rates
 
 app = Flask(__name__)
 
@@ -40,4 +39,6 @@ def get_hotels():
 
 if __name__ == "__main__":
     load_data()
+    build_inventory_index()
+    build_hotel_profiles_index()
     app.run(host='0.0.0.0', port=8080)

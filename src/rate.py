@@ -1,68 +1,46 @@
-import json
-import os
+from dataclasses import dataclass
 from typing import List
 
-global_data = None
-
-current_dir = os.path.dirname(os.path.abspath(__file__))
-json_filepath = os.path.join(current_dir, '..', 'data', 'inventory.json')
+from data_load_module import inventory_index
 
 
-def load_data():
-    global global_data
-    with open(json_filepath, 'r') as file:
-        global_data = json.load(file)
-
-
+@dataclass
 class RoomType:
-    def __init__(self, bookableRate, totalRate, totalRateInclusive, code, currency, roomDescription):
-        self.bookableRate = bookableRate
-        self.totalRate = totalRate
-        self.totalRateInclusive = totalRateInclusive
-        self.code = code
-        self.currency = currency
-        self.roomDescription = roomDescription
+    bookableRate: float
+    code: str
+    description: str
+    totalRate: float
+    totalRateInclusive: float
 
 
+@dataclass
 class RatePlan:
-    def __init__(self, hotelId, code, inDate, outDate, roomType):
-        self.hotelId = hotelId
-        self.code = code
-        self.inDate = inDate
-        self.outDate = outDate
-        self.roomType = roomType
+    hotelId: str
+    code: str
+    inDate: str
+    outDate: str
+    roomType: RoomType
 
 
+@dataclass
 class Result:
-    def __init__(self, ratePlans: List[RatePlan]):
-        self.ratePlans = ratePlans
+    ratePlans: List[RatePlan]
 
 
-def get_rates(hotelIds: List[str], inDate: str, outDate: str) -> Result:
-    hotelIds_set = set(hotelIds)
-    filtered_data = [rate for rate in global_data if
-                     rate['hotelId'] in hotelIds_set and rate['inDate'] == inDate and rate['outDate'] == outDate]
-    ratePlans = []
-    for rate in filtered_data:
-        roomType_data = rate['roomType']
-        roomType = RoomType(
-            bookableRate=roomType_data['bookableRate'],
-            totalRate=roomType_data['totalRate'],
-            totalRateInclusive=roomType_data['totalRateInclusive'],
-            code=roomType_data['code'],
-            currency=roomType_data.get('currency', 'USD'),
-            roomDescription=roomType_data.get('description', '')
-        )
+def get_rates(hotel_ids: List[str], in_date: str, out_date: str) -> Result:
+    rate_plans = []
+    for hotel_id in hotel_ids:
+        rate_info = inventory_index.get(hotel_id, {}).get(in_date, {}).get(out_date)
+        if rate_info:
+            room_type_data = rate_info['roomType']
+            room_type = RoomType(**room_type_data)
+            rate_plan = RatePlan(
+                hotelId=hotel_id,
+                code=rate_info['code'],
+                inDate=in_date,
+                outDate=out_date,
+                roomType=room_type
+            )
+            rate_plans.append(rate_plan)
 
-        ratePlan = RatePlan(
-            hotelId=rate['hotelId'],
-            code=rate['code'],
-            inDate=rate['inDate'],
-            outDate=rate['outDate'],
-            roomType=roomType
-        )
-
-        ratePlans.append(ratePlan)
-
-    result = Result(ratePlans=ratePlans)
-    return result
+    return Result(ratePlans=rate_plans)
