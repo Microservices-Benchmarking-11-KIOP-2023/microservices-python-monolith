@@ -2,8 +2,16 @@ import json
 import os
 from typing import List
 
+global_data = None
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 json_filepath = os.path.join(current_dir, '..', 'data', 'inventory.json')
+
+
+def load_data():
+    global global_data
+    with open(json_filepath, 'r') as file:
+        global_data = json.load(file)
 
 
 class RoomType:
@@ -31,11 +39,9 @@ class Result:
 
 
 def get_rates(hotelIds: List[str], inDate: str, outDate: str) -> Result:
-    with open(json_filepath, 'r') as file:
-        data = json.load(file)
-
-    filtered_data = [rate for rate in data if
-                     rate['hotelId'] in hotelIds and rate['inDate'] >= inDate and rate['outDate'] <= outDate]
+    hotelIds_set = set(hotelIds)
+    filtered_data = [rate for rate in global_data if
+                     rate['hotelId'] in hotelIds_set and rate['inDate'] == inDate and rate['outDate'] == outDate]
     ratePlans = []
     for rate in filtered_data:
         roomType_data = rate['roomType']
