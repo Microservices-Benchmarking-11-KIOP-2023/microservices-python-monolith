@@ -9,6 +9,7 @@ from data_load_module import (
 )
 from geo import get_nearby_hotels
 from rate import get_rates
+from profile import get_hotel_profiles
 
 app = Flask(__name__)
 
