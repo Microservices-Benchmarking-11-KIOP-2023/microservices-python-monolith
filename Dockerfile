@@ -1,10 +1,12 @@
-FROM python:3.9-slim
+FROM python:3.11-slim
 
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y unzip
+
+RUN pip install gunicorn
 
 COPY . .
 
@@ -16,4 +18,4 @@ RUN unzip data/inventory.zip -d data
 
 EXPOSE 8080
 
-CMD ["python", "src/main.py"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8080", "src.main:app"]

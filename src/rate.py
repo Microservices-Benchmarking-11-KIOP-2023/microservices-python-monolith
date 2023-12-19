@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
-from data_load_module import inventory_index
+from src.data_load_module import inventory_index
 
 
 @dataclass

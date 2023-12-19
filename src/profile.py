@@ -1,4 +1,4 @@
-from data_load_module import hotel_profiles_index
+from src.data_load_module import hotel_profiles_index
 
 
 def get_hotel_profiles(hotel_ids):

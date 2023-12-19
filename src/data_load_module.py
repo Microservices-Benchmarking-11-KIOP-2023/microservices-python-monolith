@@ -7,6 +7,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 data_dir = os.path.join(current_dir, "..", "data")
 data_store = {}
 
+hotel_geo_data = {}
 inventory_index = defaultdict(lambda: defaultdict(dict))
 hotel_profiles_index = {}
 
@@ -22,6 +23,15 @@ def load_data():
             print(f"Error: File {json_file} not found in {data_dir}")
         except json.JSONDecodeError:
             print(f"Error: File {json_file} is not a valid JSON file")
+
+
+def build_hotel_geo_data():
+    global hotel_geo_data
+    hotels = data_store.get("geo.json", [])
+
+    for item in hotels:
+        hotel_id = item["hotelId"]
+        hotel_geo_data[hotel_id] = {'lat': item['lat'], 'lon': item['lon'], 'data': item}
 
 
 def build_inventory_index():
@@ -41,3 +51,9 @@ def build_hotel_profiles_index():
     for hotel in hotel_profiles_data:
         hotel_id = hotel["id"]
         hotel_profiles_index[hotel_id] = hotel
+
+
+load_data()
+build_hotel_geo_data()
+build_inventory_index()
+build_hotel_profiles_index()

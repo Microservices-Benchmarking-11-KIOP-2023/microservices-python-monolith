@@ -2,14 +2,9 @@ import logging
 
 from flask import Flask, request, jsonify, abort
 
-from data_load_module import (
-    load_data,
-    build_inventory_index,
-    build_hotel_profiles_index,
-)
-from geo import get_nearby_hotels
-from rate import get_rates
-from profile import get_hotel_profiles
+from src.geo import get_nearby_hotels
+from src.profile import get_hotel_profiles
+from src.rate import get_rates
 
 app = Flask(__name__)
 
@@ -49,7 +44,10 @@ def get_hotels():
             {
                 "type": "Feature",
                 "id": hotel["id"],
-                "properties": {"name": hotel["name"], "phone_number": hotel["phoneNumber"]},
+                "properties": {
+                    "name": hotel["name"],
+                    "phone_number": hotel["phoneNumber"],
+                },
                 "geometry": {
                     "type": "Point",
                     "coordinates": [hotel["address"]["lat"], hotel["address"]["lon"]],
@@ -65,9 +63,3 @@ def get_hotels():
         logging.error(f"Unexpected error: {e}")
         abort(500, description="Internal Server Error")
 
-
-if __name__ == "__main__":
-    load_data()
-    build_inventory_index()
-    build_hotel_profiles_index()
-    app.run(host="0.0.0.0", port=8080)
